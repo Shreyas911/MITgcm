@@ -462,9 +462,9 @@ C     hopefully it does not change results.
 
       _EXCH_XY_RL(H_streamice,myThid)
 
-      WRITE(msgBuf,'(A)') 'END STREAMICE_ADVECT_THICKNESS'
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT , 1)
+C      WRITE(msgBuf,'(A)') 'END STREAMICE_ADVECT_THICKNESS'
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                     SQUEEZE_RIGHT , 1)
       CALL TIMER_STOP ('STREAMICE_ADVECT_THICKNESS',myThid)
 
 #endif

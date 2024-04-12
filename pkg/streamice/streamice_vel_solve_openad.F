@@ -96,10 +96,10 @@ C     LOCAL VARIABLES
         CALL STREAMICE_GET_VEL_RESID_ERR_OAD ( err_init, myThid )
         err_last_change = err_init
 
-        WRITE(msgBuf,'(A,E15.7)') 'initial nonlinear resid (error): ',
-     &                       err_init
-        CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                    SQUEEZE_RIGHT , 1)
+C        WRITE(msgBuf,'(A,E15.7)') 'initial nonlinear resid (error): ',
+C     &                       err_init
+C        CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                    SQUEEZE_RIGHT , 1)
 
        endif
 
@@ -207,17 +207,17 @@ c      ENDDO
 C END NL ITER. LOOP
 C-------------------------------------------------------------------
 
-      if (nl_iter .lt. streamice_max_nl_iter) then
-       WRITE(msgBuf,'(A,I5,A)') 'VELOCITY SOLVE CONVERGED, ',
-     &         nl_iter, ' iterations'
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT , 1)
-      else
-       WRITE(msgBuf,'(A,I5,A)') 'VELOCITY SOLVE NOT CONVERGED IN ',
-     &         nl_iter, ' iterations'
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT , 1)
-      endif
+C      if (nl_iter .lt. streamice_max_nl_iter) then
+C       WRITE(msgBuf,'(A,I5,A)') 'VELOCITY SOLVE CONVERGED, ',
+C     &         nl_iter, ' iterations'
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                     SQUEEZE_RIGHT , 1)
+C      else
+C       WRITE(msgBuf,'(A,I5,A)') 'VELOCITY SOLVE NOT CONVERGED IN ',
+C     &         nl_iter, ' iterations'
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                     SQUEEZE_RIGHT , 1)
+C      endif
 
       _EXCH_XY_RL(U_streamice, myThid)
       _EXCH_XY_RL(V_streamice, myThid)

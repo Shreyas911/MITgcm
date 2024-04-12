@@ -202,18 +202,18 @@ c #ifdef STREAMICE_CONSTRUCT_MATRIX
       DO bj = myByLo(myThid), myByHi(myThid)
        DO bi = myBxLo(myThid), myBxHi(myThid)
 
-       WRITE(msgBuf,'(A,I1,I1,E14.7)') 'CONJ GRAD INIT RESID LOCAL, ',
-     &         bi,bj, dot_p1_tile(bi,bj)
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT , 1)
+C       WRITE(msgBuf,'(A,I1,I1,E14.7)') 'CONJ GRAD INIT RESID LOCAL, ',
+C     &         bi,bj, dot_p1_tile(bi,bj)
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                     SQUEEZE_RIGHT , 1)
 
        enddo
       enddo
 
-      WRITE(msgBuf,'(A,E14.7)') 'CONJ GRAD INIT RESID, ',
-     &         resid_0
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT , 1)
+C      WRITE(msgBuf,'(A,E14.7)') 'CONJ GRAD INIT RESID, ',
+C     &         resid_0
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                     SQUEEZE_RIGHT , 1)
 
 C    CCCCCCCCCCCCCCCCCCCC
 
@@ -255,9 +255,9 @@ c  !!!!!!!!!!!!!!!!!!
 
 c  ! initially, b-grid data is valid up to 3 halo nodes out -- right? (check for MITgcm!!)
 
-      WRITE(msgBuf,'(A)') 'BEGINNING MAIN CG LOOP'
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT , 1)
+C      WRITE(msgBuf,'(A)') 'BEGINNING MAIN CG LOOP'
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                     SQUEEZE_RIGHT , 1)
 
 c       IF(STREAMICE_construct_matrix) CALL STREAMICE_CG_MAKE_A(myThid)
 

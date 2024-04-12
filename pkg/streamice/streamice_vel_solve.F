@@ -138,10 +138,10 @@ c to stop ifort complaining
 c$TAF STORE err_init = comlev1, key=ikey_dynamics
 #endif
 
-       WRITE(msgBuf,'(A,E15.7)') 'initial nonlinear resid (error): ',
-     &                       err_init
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                    SQUEEZE_RIGHT , 1)
+C       WRITE(msgBuf,'(A,E15.7)') 'initial nonlinear resid (error): ',
+C     &                       err_init
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                    SQUEEZE_RIGHT , 1)
 
       endif !STREAMICE_chkresidconvergence
 
@@ -245,12 +245,12 @@ c$TAF STORE V_streamice = comlev1_stream_nl, key=ikey_nl
 #endif
 
 c-----------------------------------------------------------------------------
-       WRITE(msgBuf,'(A,I5,A,I4,A)') 'streamice linear solve number',
-     &                       iter, " ",
-     &                       cg_iters,
-     &                       ' iterations '
-        CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                    SQUEEZE_RIGHT , 1)
+C       WRITE(msgBuf,'(A,I5,A,I4,A)') 'streamice linear solve number',
+C     &                       iter, " ",
+C     &                       cg_iters,
+C     &                       ' iterations '
+C        CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                    SQUEEZE_RIGHT , 1)
 c-----------------------------------------------------------------------------
 
 #ifdef ALLOW_AUTODIFF_TAMC
@@ -283,10 +283,10 @@ c----------------------CONVERGENCE TESTS-------------------------------
 #endif
      I     myThid )
 
-       WRITE(msgBuf,'(A,E15.7)') 'err/err_init',
-     &                       err_max/err_init
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                    SQUEEZE_RIGHT , 1)
+C       WRITE(msgBuf,'(A,E15.7)') 'err/err_init',
+C     &                       err_max/err_init
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                    SQUEEZE_RIGHT , 1)
 
        IF (err_max .LE. streamice_nonlin_tol * err_init) THEN
         CONVERGED = .true.
@@ -314,10 +314,10 @@ c----------------------CONVERGENCE TESTS-------------------------------
         ENDDO
        ENDDO
 
-       WRITE(msgBuf,'(A,1PE22.14)') 'STREAMICE_FP_ERROR =',
-     &                       err_max_fp
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                    SQUEEZE_RIGHT , 1)
+C       WRITE(msgBuf,'(A,1PE22.14)') 'STREAMICE_FP_ERROR =',
+C     &                       err_max_fp
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                    SQUEEZE_RIGHT , 1)
 
        IF (err_max_fp .LE. streamice_nonlin_tol_fp) THEN
         CONVERGED = .true.
@@ -331,10 +331,10 @@ c----------------------END CONVERGENCE TESTS-------------------------------
      &   STREAMICE_lower_cg_tol) THEN
          cgtol = cgtol * 5.e-2
          err_lastchange = err_max
-         WRITE(msgBuf,'(A,E15.7)') 'new cg tol: ',
-     &                       cgtol
-         CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                    SQUEEZE_RIGHT , 1)
+C         WRITE(msgBuf,'(A,E15.7)') 'new cg tol: ',
+C     &                       cgtol
+C         CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                    SQUEEZE_RIGHT , 1)
        ENDIF
 
        ENDIF ! (err_max .GT. streamice_nonlin_tol * err_init)
@@ -343,17 +343,17 @@ c----------------------END CONVERGENCE TESTS-------------------------------
 C END NL ITER. LOOP
 C-------------------------------------------------------------------
 
-      if (iter_numconv .lt. maxnliter) then
-       WRITE(msgBuf,'(A,I5,A)') 'VELOCITY SOLVE CONVERGED, ',
-     &         iter_numconv, ' iterations'
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT , 1)
-      else
-       WRITE(msgBuf,'(A,I5,A)') 'VELOCITY SOLVE NOT CONVERGED IN ',
-     &         iter_numconv, ' iterations'
-       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                     SQUEEZE_RIGHT , 1)
-      endif
+C      if (iter_numconv .lt. maxnliter) then
+C       WRITE(msgBuf,'(A,I5,A)') 'VELOCITY SOLVE CONVERGED, ',
+C     &         iter_numconv, ' iterations'
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                     SQUEEZE_RIGHT , 1)
+C      else
+C       WRITE(msgBuf,'(A,I5,A)') 'VELOCITY SOLVE NOT CONVERGED IN ',
+C     &         iter_numconv, ' iterations'
+C       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                     SQUEEZE_RIGHT , 1)
+C      endif
 
       _EXCH_XY_RL(U_streamice, myThid)
       _EXCH_XY_RL(V_streamice, myThid)

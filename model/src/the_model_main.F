@@ -610,6 +610,15 @@ C     myIter :: Iteration counter for this thread
       LOGICAL lastdiva
 CEOP
 
+C ADDED TEMPORARILY BY LLH FOR ADJOINT TESTING:
+      COMMON /ctrl_dummy_arr_b/ xx_genarr2d_dummyb, xx_gentim2d_dummyb
+      REAL*8 xx_genarr2d_dummyb(2)
+      REAL*8 xx_gentim2d_dummyb(1)
+      COMMON /cost_r_b/ fcb
+      REAL*8 fcb
+C END ADDED BY LLH
+
+
 C--   set default:
       exst     = .TRUE.
       lastdiva = .TRUE.
@@ -677,12 +686,15 @@ C--   Set model configuration (fixed arrays)
 # elif defined( ALLOW_ADJOINT_RUN )
 
 # ifdef ALLOW_TAPENADE
+        fcb = 1.0
         CALL TIMER_START('THE_MAIN_LOOP_B',myThid)
         CALL THE_MAIN_LOOP_B( myTime, myIter, myThid )
         CALL TIMER_STOP ('THE_MAIN_LOOP_B',myThid)
         CALL ADSTACK_SHOWPEAKSIZE()
         CALL ADSTACK_SHOWTOTALTRAFFIC()
         CALL ADPROFILEADJ_SHOWPROFILES()
+        PRINT *, "ADJOINT xx_genarr2d_dummyb", xx_genarr2d_dummyb
+        PRINT *, "ADJOINT xx_gentim2d_dummyb", xx_gentim2d_dummyb
 # else /* ALLOW_TAPENADE */
 
 #  ifdef ALLOW_DIVIDED_ADJOINT

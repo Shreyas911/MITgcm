@@ -76,23 +76,24 @@ C     LOCAL VARIABLES
 #endif
 
       IF (ISINLOOP .ne. 0) THEN
-        IF (.NOT. CONVERGED) THEN
+C[Removing non proper fixed point loop for tapenade]
+C        IF (.NOT. CONVERGED) THEN
           NL_ITER = (NL_ITER + 1)
           CALL streamice_vel_phi(MYTHID,MAXNLITER,MAXCGITER,CGTOL
      +,CG_ITERS,err_max)
 
-          WRITE(msgBuf,'(A,I5,A,I4,A)') 'streamice linear solve number',
-     +NL_ITER,' ',CG_ITERS,' iterations '
-          CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     +         SQUEEZE_RIGHT, 1)
+C          WRITE(msgBuf,'(A,I5,A,I4,A)') 'streamice linear solve number',
+C     +NL_ITER,' ',CG_ITERS,' iterations '
+C          CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     +         SQUEEZE_RIGHT, 1)
 
 C!!!!!!!!!!! conv check
 
           IF (STREAMICE_chkresidconvergence) THEN
 
-           WRITE(msgBuf,'(A,E15.7)') 'err/err_init', err_max/err_init
-           CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     +         SQUEEZE_RIGHT, 1)
+C           WRITE(msgBuf,'(A,E15.7)') 'err/err_init', err_max/err_init
+C           CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     +         SQUEEZE_RIGHT, 1)
 
            IF (err_max .LE. streamice_nonlin_tol * err_init) THEN
             CONVERGED = .TRUE.
@@ -113,10 +114,10 @@ C!!!!!!!!!!! conv check
 
            CALL STREAMICE_GET_FP_ERR_OAD ( err_max_fp, myThid )
 
-           WRITE(msgBuf,'(A,1PE22.14)') 'STREAMICE_FP_ERROR =', err_max_
-     +fp
-           CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     +          SQUEEZE_RIGHT, 1)
+C           WRITE(msgBuf,'(A,1PE22.14)') 'STREAMICE_FP_ERROR =', err_max_
+C     +fp
+C           CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     +          SQUEEZE_RIGHT, 1)
 
            IF (err_max_fp .LE. streamice_nonlin_tol_fp) THEN
             CONVERGED = .TRUE.
@@ -145,7 +146,7 @@ C!!!!!!!!!!! conv check
 
 C!!!!!!!!!!! end conv check
 
-        ENDIF
+C[FP issue]        ENDIF
       ENDIF
 
 #endif /* ALLOW_STREAMICE_OAD_FP */

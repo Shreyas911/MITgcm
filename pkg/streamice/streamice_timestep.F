@@ -91,11 +91,11 @@ c          h_after_uflux_si(i,j,bi,bj) = 0. _d 0
       CALL TIMER_START('STREAMICE_TIMESTEP [FORWARD_STEP]',
      &       myThid)
 
-      WRITE(msgBuf,'(A,I10.10,E9.2,A)')
-     &  'streamice solo_time_step: nIter',
-     &  myIter, myTime/86400.0/365.0, 'seconds'
-      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                   SQUEEZE_RIGHT , 1)
+C      WRITE(msgBuf,'(A,I10.10,E9.2,A)')
+C     &  'streamice solo_time_step: nIter',
+C     &  myIter, myTime/86400.0/365.0, 'seconds'
+C      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                   SQUEEZE_RIGHT , 1)
 
       CALL STREAMICE_DUMP( myTime, myIter, myThid )
 
@@ -163,10 +163,10 @@ c NEW DIRECTIVES - DNG
 
         CALL GLOBAL_SUM_TILE_RL(
      &                sum_square_vel_tile, sum_square_vel, myThid )
-        WRITE(msgBuf,'(A,I3,A,1PE22.14)') 'ECSE_CRYO_SUM ', myIter, ', '
-     &                       ,sum_square_vel
-        CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
-     &                    SQUEEZE_RIGHT , 1)
+C        WRITE(msgBuf,'(A,I3,A,1PE22.14)') 'ECSE_CRYO_SUM ', myIter, ', '
+C     &                       ,sum_square_vel
+C        CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+C     &                    SQUEEZE_RIGHT , 1)
 
 #endif
 
