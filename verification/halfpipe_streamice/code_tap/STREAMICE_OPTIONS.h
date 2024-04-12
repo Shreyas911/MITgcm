@@ -28,6 +28,9 @@ C   only one should be defined
 #undef STREAMICE_TRACER_AB
 #undef STREAMICE_SERIAL_TRISOLVE
 
+C- for OpenAD:
+#define ALLOW_STREAMICE_OAD_FP
+
 #endif /* ALLOW_STREAMICE */
 #endif /* STREAMICE_OPTIONS_H */
 

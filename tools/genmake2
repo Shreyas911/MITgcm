@@ -3228,7 +3228,9 @@ if test "x$TAPENADE" != x ; then
 cat >>$MAKEFILE <<EOF
 TAPENADE_SUPPORT_C_SRC_FILES = \
 ${TAPTOOLS}/ADFirstAidKit/adStack.c \
-${TAPTOOLS}/ADFirstAidKit/adBinomial.c
+${TAPTOOLS}/ADFirstAidKit/adBinomial.c \
+${TAPTOOLS}/ADFirstAidKit/adProfile.c \
+${TAPTOOLS}/ADFirstAidKit/adFixedPoint.c
 EOF
 echo 'TAP_SUPPORT_OBJFILES = $(TAPENADE_SUPPORT_C_SRC_FILES:.c=.o)' >> $MAKEFILE
 fi
@@ -3370,7 +3372,7 @@ CPPCMD = cat \$< | ${CPP} \$(DEFINES) \$(INCLUDES) | ${S64}
 	cp \$< \$(basename  \$<).f90
 	\$(F90C) \$(F90FLAGS) \$(F90OPTIM) -c \$(F90FIXEDFORMAT) \$(basename  \$<).f90
 .c.o:
-	\$(CC) \$(CFLAGS) \$(DEFINES) \$(INCLUDES) -c \$<
+	\$(CC) -D_ADSTACKPROFILE -D_ADSTACKPREFETCH \$(CFLAGS) \$(DEFINES) \$(INCLUDES) -c \$<
 .flow.flowdir:
 	\$(CPPCMD) > \$@
 
@@ -3675,7 +3677,7 @@ TAP_TLM_FILES: \$(AD_FILES) f95_test_mods.f90
 .PHONY: TAP_ADJ_FILES
 TAP_ADJ_FILES: \$(AD_FILES) f95_test_mods.f90
 	touch \$(AD_FILES_ADJ)
-	\$(TAPENADECMD) -b -ext "${TAPTOOLS}/flow_tap" -head "the_main_loop(fc)/(xx_genarr3d_dummy, xx_genarr2d_dummy, xx_gentim2d_dummy)" \$(AD_FILES) f95_test_mods.f90
+	\$(TAPENADECMD) -profile -b -ext "${TAPTOOLS}/flow_tap" -head "the_main_loop(fc)/(xx_genarr3d_dummy, xx_genarr2d_dummy, xx_gentim2d_dummy)" \$(AD_FILES) f95_test_mods.f90
 
 tap_adj: ad_exe_target
 ad_exe_target:

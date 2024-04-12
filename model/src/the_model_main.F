@@ -677,7 +677,12 @@ C--   Set model configuration (fixed arrays)
 # elif defined( ALLOW_ADJOINT_RUN )
 
 # ifdef ALLOW_TAPENADE
+        CALL TIMER_START('THE_MAIN_LOOP_B',myThid)
         CALL THE_MAIN_LOOP_B( myTime, myIter, myThid )
+        CALL TIMER_STOP ('THE_MAIN_LOOP_B',myThid)
+        CALL ADSTACK_SHOWPEAKSIZE()
+        CALL ADSTACK_SHOWTOTALTRAFFIC()
+        CALL ADPROFILEADJ_SHOWPROFILES()
 # else /* ALLOW_TAPENADE */
 
 #  ifdef ALLOW_DIVIDED_ADJOINT
