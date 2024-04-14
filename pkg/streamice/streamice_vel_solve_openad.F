@@ -128,7 +128,10 @@ C     LOCAL VARIABLES
      O                   err_init,
      I                   isinloop0)
 #endif
-
+#ifdef ALLOW_TAPENADE
+C      Tapenade Pragma for fixed point iters
+C$AD FP-LOOP
+#endif
       DO loopiter=1,maxNLIter
 
 C     To avoid using "exit", loop goes through all iterations
