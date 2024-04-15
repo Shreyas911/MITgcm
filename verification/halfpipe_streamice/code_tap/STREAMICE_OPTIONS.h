@@ -11,8 +11,6 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
 
 C Place CPP define/undef flag here
 
-#define ALLOW_STREAMICE_OAD_FP
-
 #define STREAMICE_CONSTRUCT_MATRIX
 #define STREAMICE_HYBRID_STRESS
 #undef STREAMICE_FLOWLINE_BUTTRESS
@@ -31,6 +29,7 @@ C   only one should be defined
 #undef STREAMICE_SERIAL_TRISOLVE
 
 C- for OpenAD:
+C[JLB] #define STREAMICE_ALLOW_BGLEN_CONTROL
 #define ALLOW_STREAMICE_OAD_FP
 
 #endif /* ALLOW_STREAMICE */

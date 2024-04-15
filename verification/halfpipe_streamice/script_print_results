@@ -1,0 +1,2 @@
+/CALL STREAMICE_GET_VEL_RESID_ERR_OAD_B/i \
+       if (myiter.eq.0) print *,"OUTPUT SUM OF b_glen:",SUM(b_glenb)

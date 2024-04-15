@@ -32,7 +32,7 @@ Updating autodiff
 
 Two elements need to be done once and for all here: 
 1. Remove 'NO' in the C$NOAD FP-LOOP in streamice_vel_solve.H ---> This has been done, but the tests fail
-2. Update halfpipe_streamice/code_tap/STREAMICE_OPTIONS.h with to define  ALLOW_STREAMICE_OAD_FP
+2. Update halfpipe_streamice/code_tap/STREAMICE_OPTIONS.h with to define  ALLOW_STREAMICE_OAD_FP --- WARNING: There seems to be a #undefALLOW_STREAMICE_OAD_FP towards the end of the file!
 
 Updating ADFirstAidKit
 ----------------------
