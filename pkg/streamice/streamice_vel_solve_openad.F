@@ -130,7 +130,7 @@ C     LOCAL VARIABLES
 #endif
 #ifdef ALLOW_TAPENADE
 C      Tapenade Pragma for fixed point iters
-C$AD FP-LOOP
+C$NOAD FP-LOOP
 #endif
       DO loopiter=1,maxNLIter
 
