@@ -66,6 +66,9 @@ typedef struct _LevelCkpStack {
   unsigned int ckpRank; // The rank (>=1) of the static checkpoint that is now encountered
   cycle_time_t ckpT;
   cycle_time_t basisCkpT;
+#ifdef _ADPROFILETRACE
+  stack_size_t sizeBeforeSnp;
+#endif
   stack_size_t sizeAfterSnp;
   struct _LevelCkpStack *previous;
 } LevelCkpStack;
@@ -140,6 +143,9 @@ LevelCkpStack* stackNewLevelCkp(unsigned int ckpRank, LevelCkpStack* levelCheckp
   additionalLevelCkp->ckpRank = ckpRank;
   additionalLevelCkp->ckpT = 0;
   additionalLevelCkp->basisCkpT = 0;
+#ifdef _ADPROFILETRACE
+  additionalLevelCkp->sizeBeforeSnp = 0;
+#endif
   additionalLevelCkp->sizeAfterSnp = 0;
   additionalLevelCkp->previous = levelCheckpoints;
   return additionalLevelCkp;
@@ -186,6 +192,7 @@ CostBenefit** getSetTCB(CostBenefit **toCostBenefits, unsigned int ckpRank) {
   }
   return toCostBenefits;
 }
+
 #ifdef _ADPROFILETRACE
 
 int depthCkp(CkpStack* checkpoints) {
@@ -221,6 +228,9 @@ void dumpCostBenefits(CostBenefit *costBenefits) {
 void adProfileAdj_SNPWrite(char* callname, char* filename, unsigned int lineno) {
   unsigned int ckpRank = getCheckpointLocationRank(callname, filename, lineno);
   curCheckpoints->levelCheckpoints = stackNewLevelCkp(ckpRank, curCheckpoints->levelCheckpoints);
+#ifdef _ADPROFILETRACE
+  curCheckpoints->levelCheckpoints->sizeBeforeSnp = adStack_getCurrentStackSize();
+#endif
   curCheckpoints->levelCheckpoints->basisCkpT = mytime_();
 }
 
@@ -266,12 +276,13 @@ void adProfileAdj_endReverse(char* callname, char* filename, unsigned int lineno
   delta_size_t additionalPM;
 #ifdef _ADPROFILETRACE
   if (_ADPROFILETRACE==-1 || _ADPROFILETRACE==localCkpRank) {
-    printf("ENDREVERSE OF %s::%i CALL %s, DEPTH:%i, SIZEAFTERSNP:%"PRId64"\n",
-         allCkpLocations[localCkpRank]->fname,
-         allCkpLocations[localCkpRank]->line_nb,
-         (allCkpLocations[localCkpRank]->callee_name ? allCkpLocations[localCkpRank]->callee_name : "MANUAL"),
-         depthCkp(curCheckpoints),
-         curCheckpoints->levelCheckpoints->sizeAfterSnp);
+    printf("ENDREVERSE OF %s::%i CALL %s, DEPTH:%i, SIZEBEFORESNP:%"PRId64", SIZEAFTERSNP:%"PRId64"\n",
+           allCkpLocations[localCkpRank]->fname,
+           allCkpLocations[localCkpRank]->line_nb,
+           (allCkpLocations[localCkpRank]->callee_name ? allCkpLocations[localCkpRank]->callee_name : "MANUAL"),
+           depthCkp(curCheckpoints),
+           curCheckpoints->levelCheckpoints->sizeBeforeSnp,
+           curCheckpoints->levelCheckpoints->sizeAfterSnp);
     printf("  BEFORE (peak:%"PRId64" bytes) :", peakSize1);
     dumpCostBenefits(curCheckpoints->costBenefits);
     printf("\n  ADDING (peak:%"PRId64" bytes) :", peakSize2);
@@ -372,44 +383,90 @@ typedef struct _SortedCostBenefit {
   unsigned int ckpRank; 
   cycle_time_t deltaT;
   delta_size_t deltaPM;
+  float ratio;
   struct _SortedCostBenefit* next;
 } SortedCostBenefit;
 
-int isSortedAfter(unsigned int ckpRank1, unsigned int ckpRank2) {
+int callNameComesAfter(unsigned int ckpRank1, unsigned int ckpRank2) {
   int comparison = strcmp(allCkpLocations[ckpRank1]->callee_name, allCkpLocations[ckpRank2]->callee_name);
   return (comparison>0 || (comparison==0 && allCkpLocations[ckpRank1]->line_nb > allCkpLocations[ckpRank2]->line_nb));
 }
 
+void showOneCostBenefit(SortedCostBenefit* sortedCostBenefits) {
+  CkpLocation* ckpLocation = allCkpLocations[sortedCostBenefits->ckpRank];
+  cycle_time_t deltaT = (sortedCostBenefits->deltaT / 1000) ; // now milliSeconds!
+  int deltaTsec = deltaT/1000 ;
+  int deltaTmillisec = deltaT%1000 ;
+  printf("  - Time gain %2d.%03d s.", deltaTsec, deltaTmillisec);
+  delta_size_t deltaPM = sortedCostBenefits->deltaPM;
+  if (deltaPM<0) {
+    printf(" and peak memory gain %"PRId64"b", deltaPM);
+  } else if (deltaPM==0) {
+    printf(" at peak memory cost zero");
+  } else {
+    int deltaPMMb = deltaPM/1000000 ;
+    int deltaPMb = deltaPM%1000000 ;
+    printf(" at peak memory cost %4d.%06d Mb", deltaPMMb, deltaPMb);
+  }
+  if (ckpLocation->callee_name) {
+    printf(" for call %s (%u times), at", ckpLocation->callee_name, ckpLocation->occurrences);
+  } else {
+    printf(" for checkpoint (%u times) starting at", ckpLocation->occurrences);
+  }
+  printf(" location#%u: line %u of file %s\n", sortedCostBenefits->ckpRank, ckpLocation->line_nb, ckpLocation->fname);
+  sortedCostBenefits = sortedCostBenefits->next;
+}
+
 void adProfileAdj_showProfiles() {
-  SortedCostBenefit* sortedCostBenefits = NULL ;
+  SortedCostBenefit* sortedCostBenefitsN = NULL ;
+  SortedCostBenefit* sortedCostBenefitsZ = NULL ;
+  SortedCostBenefit* sortedCostBenefitsP = NULL ;
   CostBenefit *costBenefits = initialCkpStack.costBenefits;
+  SortedCostBenefit** toSortedCostBenefits;
+  float ratio;
   while (costBenefits) {
     unsigned int newCkpRank = costBenefits->ckpRank;
-    SortedCostBenefit** toSortedCostBenefits = &sortedCostBenefits;
-    while (*toSortedCostBenefits && isSortedAfter(newCkpRank, (*toSortedCostBenefits)->ckpRank)) {
-      toSortedCostBenefits = &((*toSortedCostBenefits)->next);
+    if (costBenefits->deltaPM <= 0) {
+      // Sort negative memory costs and zero memory costs in two lists ordered by routine name then location rank:
+      toSortedCostBenefits = (costBenefits->deltaPM==0 ? &sortedCostBenefitsZ : &sortedCostBenefitsN) ;
+      ratio = 0.0;
+      while (*toSortedCostBenefits && callNameComesAfter(newCkpRank, (*toSortedCostBenefits)->ckpRank)) {
+        toSortedCostBenefits = &((*toSortedCostBenefits)->next);
+      }
+    } else {
+      // Sort positive memory costs by decreasing time/memory benefit:
+      toSortedCostBenefits = &sortedCostBenefitsP ;
+      ratio = ((float)costBenefits->deltaT) / ((float)costBenefits->deltaPM) ;
+      while (*toSortedCostBenefits && ratio<(*toSortedCostBenefits)->ratio) {
+        toSortedCostBenefits = &((*toSortedCostBenefits)->next);
+      }
     }
     SortedCostBenefit *newSorted = (SortedCostBenefit*)malloc(sizeof(SortedCostBenefit));
     newSorted->ckpRank = newCkpRank ;
     newSorted->deltaT = costBenefits->deltaT;
     newSorted->deltaPM = costBenefits->deltaPM;
+    newSorted->ratio = ratio ;
     newSorted->next = *toSortedCostBenefits;
     *toSortedCostBenefits = newSorted ;
     costBenefits = costBenefits->next;
   }
   printf("CLOCKS_PER_SEC:%d\n",CLOCKS_PER_SEC) ;
   printf("PEAK STACK:%"PRId64" bytes\n", initialCkpStack.stackPeak) ;
-  printf("CHECKPOINTING COST/BENEFITS:\n");
-  while (sortedCostBenefits) {
-    CkpLocation* ckpLocation = allCkpLocations[sortedCostBenefits->ckpRank];
-    cycle_time_t deltaT = sortedCostBenefits->deltaT;
-    delta_size_t deltaPM = sortedCostBenefits->deltaPM;
-    if (ckpLocation->callee_name) {
-      printf("  - %"PRIu64"mms//%"PRId64"b for call %s (%u, executed %u times) at line %u of file %s\n", deltaT, deltaPM, ckpLocation->callee_name, sortedCostBenefits->ckpRank, ckpLocation->occurrences, ckpLocation->line_nb, ckpLocation->fname);
-    } else {
-      printf("  - %"PRIu64"mms//%"PRId64"b for checkpoint (%u, occurs %u times) starting at line %u of file %s\n", deltaT, deltaPM, sortedCostBenefits->ckpRank, ckpLocation->occurrences, ckpLocation->line_nb, ckpLocation->fname);
-    }
-    sortedCostBenefits = sortedCostBenefits->next;
+  printf("SUGGESTED NOCHECKPOINTs:\n");
+  printf(" * Peak memory gain:\n");
+  while (sortedCostBenefitsN) {
+    showOneCostBenefit(sortedCostBenefitsN) ;
+    sortedCostBenefitsN = sortedCostBenefitsN->next;
+  }
+  printf(" * Peak memory neutral:\n");
+  while (sortedCostBenefitsZ) {
+    showOneCostBenefit(sortedCostBenefitsZ) ;
+    sortedCostBenefitsZ = sortedCostBenefitsZ->next;
+  }
+  printf(" * Peak memory cost:\n");
+  while (sortedCostBenefitsP) {
+    showOneCostBenefit(sortedCostBenefitsP) ;
+    sortedCostBenefitsP = sortedCostBenefitsP->next;
   }
 }
 
