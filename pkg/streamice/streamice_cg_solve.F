@@ -486,7 +486,7 @@ c     if iters has reached max_iters there is no convergence
       IF (iters .lt. maxIter) THEN
        conv_flag = 1
       ENDIF
-      PRINT *, "GOT HERE CG ITERATIONS", iters
+C      PRINT *, "GOT HERE CG ITERATIONS", iters
 
 c       DO bj = myByLo(myThid), myByHi(myThid)
 c        DO bi = myBxLo(myThid), myBxHi(myThid)
