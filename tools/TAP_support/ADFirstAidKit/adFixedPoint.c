@@ -35,6 +35,7 @@ int adFixedPoint_notReduced(double cumul, float reduction) {
       ++(adjIters[fpDepth]) ;
       return 1 ;
     } else {
+/*       printf("%i adjoint iterations (reduced %e -> %e)\n", adjIters[fpDepth], refCumuls[fpDepth], cumul) ; */
       if (fpDepth<0) return 0 ; // protect from going out of bounds.
       --fpDepth ;
       return 0 ;
@@ -58,6 +59,7 @@ int adFixedPoint_tooLarge(double cumul, float minCumul) {
       ++(adjIters[fpDepth]) ;
       return 1 ;
     } else {
+/*       printf("%i adjoint iterations (residual %e < %e)\n", adjIters[fpDepth], cumul, minCumul) ; */
       if (fpDepth<0) return 0 ; // protect from going out of bounds.
       --fpDepth ;
       return 0 ;
