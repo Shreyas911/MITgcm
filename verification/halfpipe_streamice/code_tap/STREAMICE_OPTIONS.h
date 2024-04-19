@@ -29,9 +29,6 @@ C   only one should be defined
 #undef STREAMICE_SERIAL_TRISOLVE
 #define ALLOW_STREAMICE_TAP_FP
 
-C- for OpenAD:
-#define ALLOW_STREAMICE_OAD_FP
-
 #endif /* ALLOW_STREAMICE */
 #endif /* STREAMICE_OPTIONS_H */
 
