@@ -123,6 +123,88 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
 
+      SUBROUTINE EXCH1_RL_CUBE_FWD(
+     U                 array,
+     I                 withSigns,
+     I                 myOLw, myOLe, myOLs, myOLn, myNz,
+     I                 exchWidthX, exchWidthY,
+     I                 cornerMode, myThid )
+      IMPLICIT NONE
+#include "SIZE.h"
+#include "EEPARAMS.h"
+
+      INTEGER myOLw, myOLe, myOLs, myOLn, myNz
+      _RL     array( 1-myOLw:sNx+myOLe,
+     &               1-myOLs:sNy+myOLn,
+     &               myNz, nSx, nSy )
+      LOGICAL withSigns
+      INTEGER exchWidthX
+      INTEGER exchWidthY
+      INTEGER cornerMode
+      INTEGER myThid
+
+c [llh] the following PUSHREAL8ARRAY could certainly be refined!
+      CALL PUSHREAL8ARRAY(array, 26**2*2)
+      CALL PUSHBOOLEAN(withSigns)
+      CALL PUSHINTEGER4(myOLw)
+      CALL PUSHINTEGER4(myOLe)
+      CALL PUSHINTEGER4(myOLs)
+      CALL PUSHINTEGER4(myOLn)
+      CALL PUSHINTEGER4(myNz)
+      CALL PUSHINTEGER4(exchWidthX)
+      CALL PUSHINTEGER4(exchWidthY)
+      CALL EXCH1_RL_CUBE(
+     U                 array,
+     I                 withSigns,
+     I                 myOLw, myOLe, myOLs, myOLn, myNz,
+     I                 exchWidthX, exchWidthY,
+     I                 cornerMode, myThid )
+      END
+
+C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
+
+      SUBROUTINE EXCH1_RL_CUBE_BWD(
+     U                 array, arrayb,
+     I                 withSigns,
+     I                 myOLw, myOLe, myOLs, myOLn, myNz,
+     I                 exchWidthX, exchWidthY,
+     I                 cornerMode, myThid )
+      IMPLICIT NONE
+#include "SIZE.h"
+#include "EEPARAMS.h"
+
+      INTEGER myOLw, myOLe, myOLs, myOLn, myNz
+      _RL     array( 1-myOLw:sNx+myOLe,
+     &               1-myOLs:sNy+myOLn,
+     &               myNz, nSx, nSy )
+      _RL     arrayb( 1-myOLw:sNx+myOLe,
+     &               1-myOLs:sNy+myOLn,
+     &               myNz, nSx, nSy )
+      LOGICAL withSigns
+      INTEGER exchWidthX
+      INTEGER exchWidthY
+      INTEGER cornerMode
+      INTEGER myThid
+
+      CALL POPINTEGER4(exchWidthY)
+      CALL POPINTEGER4(exchWidthX)
+      CALL POPINTEGER4(myNz)
+      CALL POPINTEGER4(myOLn)
+      CALL POPINTEGER4(myOLs)
+      CALL POPINTEGER4(myOLe)
+      CALL POPINTEGER4(myOLw)
+      CALL POPBOOLEAN(withSigns)
+      CALL EXCH1_RL_CUBE_AD(
+     U                 arrayb,
+     I                 withSigns,
+     I                 myOLw, myOLe, myOLs, myOLn, myNz,
+     I                 exchWidthX, exchWidthY,
+     I                 cornerMode, myThid )
+      CALL POPREAL8ARRAY(array, 26**2*2)
+      END
+
+C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
+
       SUBROUTINE EXCH1_RS_CUBE_B(
      U                 array, arrayb,
      I                 withSigns,
@@ -177,6 +259,70 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
 
       CALL EXCH1_RL_AD(arrayb,myOLw, myOLe, myOLs, myOLn,
      &     myNz, exchWidthX , exchWidthY, cornerMode, myThid )
+      END
+
+C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
+
+      SUBROUTINE EXCH1_RL_FWD(array,
+     &        myOLw, myOLe, myOLs, myOLn,  myNz,
+     &        exchWidthX, exchWidthY, cornerMode, myThid)
+      IMPLICIT NONE
+#include "SIZE.h"
+#include "EEPARAMS.h"
+#include "EXCH.h"
+      INTEGER myOLw, myOLe, myOLs, myOLn, myNz
+      _RL     array( 1-myOLw:sNx+myOLe,
+     &               1-myOLs:sNy+myOLn,
+     &               myNz, nSx, nSy )
+      INTEGER exchWidthX
+      INTEGER exchWidthY
+      INTEGER cornerMode
+      INTEGER myThid
+
+c [llh] the following PUSHREAL8ARRAY could certainly be refined!
+      CALL PUSHREAL8ARRAY(array, 26**2*2)
+      CALL PUSHINTEGER4(myOLw)
+      CALL PUSHINTEGER4(myOLe)
+      CALL PUSHINTEGER4(myOLs)
+      CALL PUSHINTEGER4(myOLn)
+      CALL PUSHINTEGER4(myNz)
+      CALL PUSHINTEGER4(exchWidthX)
+      CALL PUSHINTEGER4(exchWidthY)
+      CALL EXCH1_RL(array, myOLw, myOLe, myOLs, myOLn,
+     &     myNz, exchWidthX , exchWidthY, cornerMode, myThid )
+      END
+
+C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
+
+      SUBROUTINE EXCH1_RL_BWD(array, arrayb,
+     &        myOLw, myOLe, myOLs, myOLn,  myNz,
+     &        exchWidthX, exchWidthY, cornerMode, myThid)
+      IMPLICIT NONE
+#include "SIZE.h"
+#include "EEPARAMS.h"
+#include "EXCH.h"
+      INTEGER myOLw, myOLe, myOLs, myOLn, myNz
+      _RL     array( 1-myOLw:sNx+myOLe,
+     &               1-myOLs:sNy+myOLn,
+     &               myNz, nSx, nSy )
+      _RL     arrayb( 1-myOLw:sNx+myOLe,
+     &               1-myOLs:sNy+myOLn,
+     &               myNz, nSx, nSy )
+      INTEGER exchWidthX
+      INTEGER exchWidthY
+      INTEGER cornerMode
+      INTEGER myThid
+
+      CALL POPINTEGER4(exchWidthY)
+      CALL POPINTEGER4(exchWidthX)
+      CALL POPINTEGER4(myNz)
+      CALL POPINTEGER4(myOLn)
+      CALL POPINTEGER4(myOLs)
+      CALL POPINTEGER4(myOLe)
+      CALL POPINTEGER4(myOLw)
+      CALL EXCH1_RL_AD(arrayb, myOLw, myOLe, myOLs, myOLn,
+     &     myNz, exchWidthX , exchWidthY, cornerMode, myThid )
+      CALL POPREAL8ARRAY(array, 26**2*2)
       END
 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|

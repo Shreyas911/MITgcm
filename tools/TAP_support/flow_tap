@@ -83,6 +83,7 @@ type: ()
 ReadNotWritten: ()
 ReadThenWritten: ()
 NotReadThenWritten: ()
+
 subroutine cg2d:
   external:
   shape: (param 1, param 2, param 3, param 4, param 5, param 6, param 7, param 8)
@@ -1101,3 +1102,4 @@ subroutine mnc_file_close_all_matching:
   ReadNotWritten:     (1,1)
   NotReadThenWritten: (0,0)
   ReadThenWritten:    (0,0)
+
