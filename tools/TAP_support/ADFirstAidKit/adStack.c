@@ -93,7 +93,7 @@ typedef struct _DoubleChainedBlock{
 
 /** Used to build the name of each stack storage file.
  * Used only by 2nd thread */
-char tapStackFileName[14] ;
+char tapStackFileName[16] ;
 
 /** Memorizes the file action currently being done (asynchronously).
  * These 3 globals are written only by 2nd thread, only in a locked section,
@@ -544,7 +544,7 @@ void checkForward() {
   if (space->state==INUSE) {
 #ifdef _ADSTACKTRACE
       if (tracedId==-1 || tracedId==space->id) {
-        printf(" store (%c: %02i %s) into file tapStack%05i\n", 'a'+space->id,
+        printf(" store (%c: %02i %s) into file tapStack%07i\n", 'a'+space->id,
                space->rank, stateNames[space->state], space->rank) ;
       }
 #endif
@@ -560,7 +560,7 @@ void checkBackward() {
       if (space->state==INUSE) {
 #ifdef _ADSTACKTRACE
         if (tracedId==-1 || tracedId==space->id) {
-          printf(" store (%c: %02i %s) into file tapStack%05i\n", 'a'+space->id,
+          printf(" store (%c: %02i %s) into file tapStack%07i\n", 'a'+space->id,
                  space->rank, stateNames[space->state], space->rank) ;
         }
 #endif
@@ -569,7 +569,7 @@ void checkBackward() {
       space->rank = curStack->rank ;
 #ifdef _ADSTACKTRACE
       if (tracedId==-1 || tracedId==space->id) {
-        printf(" restore (%c: %02i %s) from file tapStack%05i\n", 'a'+space->id,
+        printf(" restore (%c: %02i %s) from file tapStack%07i\n", 'a'+space->id,
                space->rank, stateNames[space->state], space->rank) ;
       }
 #endif
@@ -977,7 +977,7 @@ void adStack_endRepeat() {
 
 /** Used only by 2nd thread. Not locked */
 void storeInFile(BlockContents* blockContents) {
-  sprintf(tapStackFileName, "tapStack%05i\0", blockContents->rank) ;
+  sprintf(tapStackFileName, "tapStack%07i\0", blockContents->rank) ;
   FILE *tapStackFile = fopen(tapStackFileName, "wb") ;
   fwrite(blockContents->contents, 1, BLOCK_SIZE, tapStackFile) ;
   fclose(tapStackFile) ;
@@ -985,7 +985,7 @@ void storeInFile(BlockContents* blockContents) {
 
 /** Used only by 2nd thread. Not locked */
 void restoreFromFile(BlockContents* blockContents /*, RepetitionLevel* repetitionForbidsRemove*/) {
-  sprintf(tapStackFileName, "tapStack%05i\0", blockContents->rank) ;
+  sprintf(tapStackFileName, "tapStack%07i\0", blockContents->rank) ;
   FILE *tapStackFile = fopen(tapStackFileName, "rb") ;
   fread(blockContents->contents, 1, BLOCK_SIZE, tapStackFile) ;
   fclose(tapStackFile) ;
@@ -993,8 +993,8 @@ void restoreFromFile(BlockContents* blockContents /*, RepetitionLevel* repetitio
 
 /** Used only by 1st thread. Not locked */
 void removeStorageFile(int blockRank) {
-  char tapStackFileNameBis[14] ;
-  sprintf(tapStackFileNameBis, "tapStack%05i\0", blockRank) ;
+  char tapStackFileNameBis[16] ;
+  sprintf(tapStackFileNameBis, "tapStack%07i\0", blockRank) ;
 #ifdef _ADSTACKTRACE
   printf("  Remove storage file %s\n", tapStackFileNameBis) ;
 #endif
