@@ -3681,7 +3681,7 @@ TAP_TLM_FILES: \$(AD_FILES) f95_test_mods.f90
 .PHONY: TAP_ADJ_FILES
 TAP_ADJ_FILES: \$(AD_FILES) f95_test_mods.f90 ${XTRATAPFILE}
 	touch \$(AD_FILES_ADJ)
-	\$(TAPENADECMD) -profile -b -ext "${TAPTOOLS}/flow_tap" -head "the_main_loop(fc)/(xx_genarr3d_dummy, xx_genarr2d_dummy, xx_gentim2d_dummy)" \$(AD_FILES) f95_test_mods.f90 ${XTRATAPFILE}
+	\$(TAPENADECMD) -nocheckpoint "" -profile -b -ext "${TAPTOOLS}/flow_tap" -head "the_main_loop(fc)/(xx_genarr3d_dummy, xx_genarr2d_dummy, xx_gentim2d_dummy)" \$(AD_FILES) f95_test_mods.f90 ${XTRATAPFILE}
 
 tap_adj: ad_exe_target
 ad_exe_target:
