@@ -1,0 +1,296 @@
+declare -a allroutines=(
+main_do_loop
+forward_step
+thermodynamics
+ptracers_integrate
+dynamics
+mom_fluxform
+gad_advection
+timestep
+gad_calc_rhs
+do_oceanic_phys
+gmredi_calc_tensor
+gmredi_rtransport
+calc_adv_flow
+temp_integrate
+salt_integrate
+calc_phi_hyd
+gchem_forcing_sep
+impldiff
+diags_phi_hyd
+dic_biotic_forcing
+grad_sigma
+gad_fluxlimit_adv_r
+cd_code_scheme
+integrate_for_w
+gad_fluxlimit_adv_x
+gad_fluxlimit_adv_y
+adams_bashforth2
+calc_3d_diffusivity
+cycle_tracer
+dic_atmos
+dic_surfforcing
+do_fields_blocking_exchanges
+external_forcing_surf
+freeze_surface
+gmredi_do_exch
+gmredi_residual_flow
+gmredi_slope_limit
+initialise_varia
+integr_continuity
+load_fields_driver
+mom_calc_rtrans
+mom_u_botdrag_coeff
+mom_v_botdrag_coeff
+ptracers_reset
+timestep_tracer
+tracers_correction_step
+calc_div_ghat
+calc_grad_phi_hyd
+calc_grad_phi_surf
+calc_pco2_approx
+carbon_coeffs
+correction_step
+cost_final
+external_fields_load
+find_bulkmod
+find_rho_2d
+find_rhop0
+forcing_surf_relax
+gad_c2_adv_r
+gad_c2_adv_x
+gad_c2_adv_y
+gmredi_calc_diff
+mom_calc_ke
+mom_calc_rtrans
+mom_u_adv_uu
+mom_u_adv_vu
+mom_u_adv_wu
+mom_u_metric_sphere
+mom_u_sidedrag
+mom_u_metric_sphere
+mom_u_sidedrag
+mom_u_xviscflux
+mom_u_yviscflux
+mom_v_adv_uv
+mom_v_adv_vv
+mom_v_adv_wv
+mom_v_metric_sphere
+mom_v_sidedrag
+mom_v_xviscflux
+mom_v_yviscflux
+bio_export
+o2_surfforcing
+momentum_correction_step
+packages_init_variables
+pressure_for_eos
+ptracers_fields_blocking_exch
+ptracers_forcing_surf
+rotate_uv2en_rl
+gmredi_ytransport
+gmredi_xtransport
+apply_forcing_u
+apply_forcing_v
+apply_forcing_s
+ptracers_apply_forcing
+apply_forcing_t
+phos_flux
+car_flux
+dic_cost
+do_atmospheric_phys
+ctrl_swapffields
+ctrl_map_forcing
+ctrl_get_gen
+active_read_xy
+active_read_xyz
+active_write_xy
+ctrl_init_variables
+ctrl_map_ini_gentim2d
+ctrl_map_gentim2d
+ctrl_map_ini_genarr
+ctrl_map_genarr3d
+solve_for_pressure
+exch_uv_dgrid_3d_rl
+exch_3d_rl
+exch_xy_rl
+exch_xy_rs
+exch_uv_xy_rs
+exch_uv_xyz_rl
+exch_xyz_rl
+)
+
+declare -a chosenroutines=(
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+)
+
+# Choose random number of subroutines to add to -nocheckpoint
+NBNOCKP=$(($RANDOM % 118 + 1))
+
+for ii in {1..118}
+do
+  chosenroutines[$ii - 1]=0
+done
+
+# Choose NBNOCKP unique subroutines to -nocheckpoint
+for ii in {1..118}
+do
+  if [ $ii -le $NBNOCKP ]
+  then
+    CHOSENCKP=$(($RANDOM % 118))
+    # Don't repeat subroutine already added to -nocheckpoint
+    while [ ${chosenroutines[$CHOSENCKP]} == 1 ]
+    do
+        CHOSENCKP=$(($RANDOM % 118))
+    done
+    chosenroutines[$CHOSENCKP]=1
+  fi
+done
+
+CHOSEN=""
+
+for ii in {1..118}
+do
+  if [ "${chosenroutines[$ii - 1]}" == 1 ]
+  then
+     CHOSEN="$CHOSEN ${allroutines[$ii - 1]}"
+  fi
+done
+
+echo "RUN WITH " $NBNOCKP " NOCHECKPOINTS: " $CHOSEN
+
+
+# Add subroutines to -nocheckpoint option in genmake2
+old_string="-nocheckpoint \"\""
+new_string="-nocheckpoint \"${CHOSEN}\""
+## Get fresh genmake2 first
+cp tools/genmake2_orig tools/genmake2
+## Perform the replacement using sed
+sed -i "s/$old_string/$new_string/g" tools/genmake2
+
+# Run verification experiment
+cd verification
+./testreport -adm -tap -of ../tools/build_options/linux_amd64_gfortran_sverdrup -t tutorial_global_oce_biogeo
+
+# Output results
+output_file="tutorial_global_oce_biogeo/run/output_tap_adj.txt"
+TIME=$(grep -A 3 "TAPENADE DIFFERENTIATED CODE" ${output_file} | grep "User time" | awk -F 'User time: *' '{print $2}')
+PEAK=$(grep -oE 'PEAK STACK:[[:space:]]*([0-9]+)' ${output_file} | awk -F':' '{print $2}')
+echo "TIME " $TIME " seconds, PEAK STACK: " $PEAK " bytes."
+echo $TIME "," $PEAK >> results.dat
