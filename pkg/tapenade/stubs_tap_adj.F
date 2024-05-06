@@ -31,6 +31,38 @@
       CALL GLOBAL_ADSUM_TILE_RL(phiTileb, sumPhib, myThid)
       END
 
+      SUBROUTINE GLOBAL_SUM_TILE_RL_FWD(phiTile,
+     &     sumPhi, myThid)
+      IMPLICIT NONE
+#include "SIZE.h"
+#include "EEPARAMS.h"
+#include "EESUPPORT.h"
+#include "GLOBAL_SUM.h"
+      _RL     phiTile(nSx,nSy)
+      _RL     sumPhi
+      INTEGER myThid
+      CALL PUSHINTEGER4(myThid)
+      CALL GLOBAL_SUM_TILE_RL(phiTile, sumPhi, myThid)
+      END
+
+      SUBROUTINE GLOBAL_SUM_TILE_RL_BWD(phiTile, phiTileb,
+     &     sumPhi, sumPhib, myThid)
+      IMPLICIT NONE
+#include "SIZE.h"
+#include "EEPARAMS.h"
+#include "EESUPPORT.h"
+#include "GLOBAL_SUM.h"
+      _RL     phiTile(nSx,nSy)
+      _RL     phiTileb(nSx,nSy)
+      _RL     sumPhib
+      _RL     sumPhi
+      INTEGER myThid
+
+      CALL POPINTEGER4(myThid)
+      CALL GLOBAL_ADSUM_TILE_RL(phiTileb, sumPhib, myThid)
+      CALL POPREAL8(sumPhi)
+      END
+
 !     Adjoint of global_sum_r8 for arguments Arg1=(in;out)
       SUBROUTINE GLOBAL_SUM_R8_B(sumPhi, sumPhib, myThid)
       IMPLICIT NONE
